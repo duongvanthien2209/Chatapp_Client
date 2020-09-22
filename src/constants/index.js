@@ -1,0 +1,1 @@
+export const url_image = 'http://localhost:5000/';

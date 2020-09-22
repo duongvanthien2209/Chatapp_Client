@@ -1,0 +1,23 @@
+.setting-navbar {
+    background-color: white;
+}
+
+.setting-navbar .nav-link {
+    
+}
+
+.setting-personInformation {
+    display: flex;
+    flex-direction: column;
+
+    background-color: white;
+
+    height: 100%;
+    width: 100%;
+}
+
+.setting-personInformation h4 {
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    line-height: 1.5;
+}

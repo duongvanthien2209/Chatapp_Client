@@ -1,0 +1,62 @@
+.form-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    background-image: url(../../assets/images/camp.png);
+    background-position: center;
+    background-size: cover;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+
+    width: 60%;
+    padding: 5rem 3rem 3rem;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    /* box-shadow: 5px 5px 30px -10px black; */
+}
+
+.login-image {
+    position: absolute;
+    top: 0;
+    left: 50%;
+}
+
+.login-image img {
+    position: relative;
+    top: -4.5rem;
+    left: -50%;
+
+    height: 9rem;
+    width: 9rem;
+}
+
+/* // Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+
+}
+
+/* // Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+
+}
+
+/* // Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .login-form {
+        width: 40%;
+    }
+}
+
+/* // Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .login-form {
+        width: 30%;
+    }
+}
