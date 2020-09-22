@@ -11,7 +11,13 @@ import { url_image } from '../../constants';
 
 
 const Sidebar = () => {
-    let { user } = useContext(LoginContext);
+    let { user, setUser, setLogin } = useContext(LoginContext);
+
+    let onClockOut = evt => {
+        evt.preventDefault();
+        setUser(currentState => null);
+        setLogin(currentState => false);
+    }
 
     return user && (
         <Nav className="navbar-main">
@@ -26,7 +32,7 @@ const Sidebar = () => {
                 <li><Link to="/main/setting"><span className="mr-2"><FontAwesomeIcon icon={faCog} className="fa-lg" /></span>Setting</Link></li>
             </ul>
             <div className="navbar-main__footer">
-                <a href="#"><span><FontAwesomeIcon icon={faSignOutAlt} className="fa-lg" /></span>Log out</a>
+                <a href="#" onClick={onClockOut}><span><FontAwesomeIcon icon={faSignOutAlt} className="fa-lg" /></span>Log out</a>
             </div>
         </Nav>
     );
