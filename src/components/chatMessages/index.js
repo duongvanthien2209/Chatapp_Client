@@ -28,7 +28,7 @@ const ChatMessages = ({ location }) => {
 
     let { user } = useContext(LoginContext);
 
-    const ENDPOINT = 'http://localhost:5000';
+    const ENDPOINT = 'https://chap-app-server.herokuapp.com/';
 
     // ComponentDidMount => tải messages
     useEffect(() => {

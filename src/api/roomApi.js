@@ -1,19 +1,20 @@
 import apiClient from './apiClient';
+import { base_url } from '../constants';
 
 class RoomApi {
     createRoom(_userId, data) {
-        let url = `/api/rooms/${_userId}`;
+        let url = `${base_url}/api/rooms/${_userId}`;
         return apiClient.post(url, data);
     }
 
     getRooms(_userId) {
-        let url = `/api/rooms/${_userId}`;
+        let url = `${base_url}/api/rooms/${_userId}`;
 
         return apiClient.get(url);
     }
 
     getRoomsByName(value) {
-        let url = `/api/rooms/search?q=${value}`;
+        let url = `${base_url}/api/rooms/search?q=${value}`;
 
         return apiClient.get(url);
     }

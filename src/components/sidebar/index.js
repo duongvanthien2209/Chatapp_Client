@@ -23,7 +23,8 @@ const Sidebar = () => {
         <Nav className="navbar-main">
             <div className="navbar-main__header">
                 {
-                    user.avatar === 'https://picsum.photos/200' ? <img className="rounded-circle" src={user.avatar} /> : <div className="rounded-circle navbar-main__header__avatar" style={{ backgroundImage: `url('${url_image + user.avatar}')` }}></div>
+                    // user.avatar === 'https://picsum.photos/200' ? <img className="rounded-circle" src={user.avatar} /> : <div className="rounded-circle navbar-main__header__avatar" style={{ backgroundImage: `url('${url_image + user.avatar}')` }}></div>
+                    <div className="rounded-circle navbar-main__header__avatar" style={{ backgroundImage: `url('${user.avatar}')` }}></div>
                 }
                 <p className="font-weight-bold mt-1">{user.name}</p>
             </div>

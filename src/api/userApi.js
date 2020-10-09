@@ -1,20 +1,21 @@
 import axiosClient from './apiClient';
+import { base_url } from '../constants';
 
 class UserApi {
     getToken(data) {
-        let url = '/api/auth/login';
+        let url = `${base_url}/api/auth/login`;
 
         return axiosClient.post(url, data);
     }
 
     register(data) {
-        let url = '/api/auth/register';
+        let url = `${base_url}/api/auth/register`;
 
         return axiosClient.post(url, data);
     }
 
     update(data, userId) {
-        let url = `/api/auth/update/${userId}`;
+        let url = `${base_url}/api/auth/update/${userId}`;
 
         return axiosClient.post(url, data);
     }
