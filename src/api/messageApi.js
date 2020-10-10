@@ -1,15 +1,15 @@
 import apiClient from './apiClient';
 
-import { base_url } from '../constants';
+import { baseUrl } from '../constants';
 
 class MessageApi {
-    getMessagesByRoomId(roomId) {
-        let url = `${base_url}/api/messages/${roomId}`;
+  // eslint-disable-next-line class-methods-use-this
+  getMessagesByRoomId(roomId) {
+    const url = `${baseUrl}/api/messages/${roomId}`;
 
-        return apiClient.get(url);
-    }
+    return apiClient.get(url);
+  }
 }
 
 const messageApi = new MessageApi();
 export default messageApi;
-

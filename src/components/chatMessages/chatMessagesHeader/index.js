@@ -1,19 +1,16 @@
 import React from 'react';
-// Font Awesome
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
-import { Button } from 'reactstrap'; 
+const ChatMessagesHeader = ({ roomName }) => (
+  <div className="chat-messages__header">
+    <div className="chat-messages__person">
+      <h4>{roomName}</h4>
+    </div>
+  </div>
+);
 
-const ChatMessagesHeader = ({ roomName }) => {
-    return (
-        <div className="chat-messages__header">
-            <div className="chat-messages__person">
-                <h4>{roomName}</h4>
-            </div>
-            {/* <Button><FontAwesomeIcon icon={faEllipsisV} /></Button> */}
-        </div>
-    );
+ChatMessagesHeader.propTypes = {
+  roomName: PropTypes.string.isRequired,
 };
 
 export default ChatMessagesHeader;

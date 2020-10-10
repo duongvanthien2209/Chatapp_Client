@@ -1,13 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const ChatContaintRooms = ({ rooms, children }) => {
-    return (
-        <ul className="list-unstyled rooms">
-            {
-                rooms.map(children)
-            }
-        </ul>
-    );
+const ChatContaintRooms = ({ rooms, children }) => (
+  <ul className="list-unstyled rooms">{rooms.map(children)}</ul>
+);
+
+ChatContaintRooms.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  rooms: PropTypes.array.isRequired,
+  children: PropTypes.string.isRequired,
 };
 
 export default ChatContaintRooms;

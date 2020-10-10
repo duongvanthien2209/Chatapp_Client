@@ -1,24 +1,27 @@
 import axiosClient from './apiClient';
-import { base_url } from '../constants';
+import { baseUrl } from '../constants';
 
 class UserApi {
-    getToken(data) {
-        let url = `${base_url}/api/auth/login`;
+  // eslint-disable-next-line class-methods-use-this
+  getToken(data) {
+    const url = `${baseUrl}/api/auth/login`;
 
-        return axiosClient.post(url, data);
-    }
+    return axiosClient.post(url, data);
+  }
 
-    register(data) {
-        let url = `${base_url}/api/auth/register`;
+  // eslint-disable-next-line class-methods-use-this
+  register(data) {
+    const url = `${baseUrl}/api/auth/register`;
 
-        return axiosClient.post(url, data);
-    }
+    return axiosClient.post(url, data);
+  }
 
-    update(data, userId) {
-        let url = `${base_url}/api/auth/update/${userId}`;
+  // eslint-disable-next-line class-methods-use-this
+  update(data, userId) {
+    const url = `${baseUrl}/api/auth/update/${userId}`;
 
-        return axiosClient.post(url, data);
-    }
+    return axiosClient.post(url, data);
+  }
 }
 
 const userApi = new UserApi();

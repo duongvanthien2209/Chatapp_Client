@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import io from 'socket.io-client';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
 // Font Awesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -21,106 +22,130 @@ import messageApi from '../../api/messageApi';
 let socket;
 
 const ChatMessages = ({ location }) => {
-    let { roomId, roomName } = queryString.parse(location.search);
+  const { roomId, roomName } = queryString.parse(location.search);
 
-    let [messages, setMessages] = useState([]);
-    let [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
 
-    let { user } = useContext(LoginContext);
+  const { user } = useContext(LoginContext);
 
-    const ENDPOINT = 'https://chap-app-server.herokuapp.com/';
+  const ENDPOINT = 'https://chap-app-server.herokuapp.com/';
 
-    // ComponentDidMount => tải messages
-    useEffect(() => {
-        console.log('Construtor');
+  // ComponentDidMount => tải messages
+  useEffect(() => {
+    socket = io(ENDPOINT);
 
-        socket = io(ENDPOINT);
+    socket.on('event', (text) => {
+      // eslint-disable-next-line no-console
+      console.log(text);
+    });
 
-        socket.on('event', text => {
-            console.log(text);
-        });
-
-        socket.on('message', currentMessage => {
-            // debugger;
-            setMessages(currentMessages => [...currentMessages, currentMessage]);
-        });
+    socket.on('message', (currentMessage) => {
+      // debugger;
+      setMessages((currentMessages) => [...currentMessages, currentMessage]);
+    });
+    // debugger;
+    messageApi
+      .getMessagesByRoomId(roomId)
+      .then((res) => {
         // debugger;
-        messageApi.getMessagesByRoomId(roomId).then(res => {
-            // debugger;
-            let { status, data: { messages: newMessages } } = res;
+        const {
+          status,
+          data: { messages: newMessages },
+        } = res;
 
-            if (status !== 'success' || !newMessages) {
-                throw new Error('Có lỗi xảy ra');
-                return;
-            }
-
-            setMessages(currentMessages => newMessages);
-
-            socket.emit('join', { roomId, userId: user._id }, err => {
-                if (err) {
-                    console.log('Có lỗi xảy ra');
-                    return;
-                }
-
-                console.log('Done');
-            });
-        }).catch(err => console.log(err));
-
-        return () => {
-            console.log('DidMount')
-            socket.emit('disconnect', { roomId, userName: user.name });
-
-            socket.off();
+        if (status !== 'success' || !newMessages) {
+          throw new Error('Có lỗi xảy ra');
         }
-    }, [ENDPOINT, location.search]);
 
-    const sendMessage = evt => {
-        evt.preventDefault();
+        setMessages(() => newMessages);
 
-        socket.emit('sendMessage', { userId: user._id, roomId, text: message }, (err) => {
-            if (err) {
-                console.log('Có lỗi xảy ra');
-                return;
-            }
+        socket.emit('join', { roomId, userId: user.id }, (err) => {
+          if (err) {
+            // eslint-disable-next-line no-console
+            console.log('Có lỗi xảy ra');
+            return;
+          }
 
-            setMessage('');
+          // eslint-disable-next-line no-console
+          console.log('Done');
         });
-    }
+      })
+      // eslint-disable-next-line no-console
+      .catch((err) => console.log(err));
 
-    return (
-        <div className="chat-messages h-100">
-            <ChatMessagesHeader roomName={roomName} />
-            <ScrollToBottom className="messages-scroll">
-                <ChatMessagesList messages={messages}>
-                    {
-                        item => {
-                            return item.userId === user._id ? (
-                                <li className="chat-message-me">
-                                    <div className="chat-message-me__text">
-                                        <p>{item.text}</p>
-                                        <span>{moment(item.dateCreate).fromNow()}</span>
-                                    </div>
-                                    <FontAwesomeIcon icon={faCheck} className="fa-sm" />
-                                </li>
-                            ) : (
-                                    <li className="chat-message-friend">
-                                        <div className="chat-message-friend__infor">
-                                            <img className="rounded-circle" src={item.user.name === 'admin' ? 'https://picsum.photos/200' : item.user.avatar} alt="Person" />
-                                            <small className="text-muted">{item.user.name}</small>
-                                        </div>
-                                        <div className="chat-message-friend__text">
-                                            <p>{item.text}</p>
-                                            <span>{moment(item.dateCreate).fromNow()}</span>
-                                        </div>
-                                    </li>
-                                )
-                        }
-                    }
-                </ChatMessagesList>
-            </ScrollToBottom>
-            <ChatMessagesInput sendMessage={sendMessage} message={message} setMessage={setMessage} />
-        </div>
+    return () => {
+      socket.emit('disconnect', { roomId, userName: user.name });
+
+      socket.off();
+    };
+  }, [ENDPOINT, location.search]);
+
+  const sendMessage = (evt) => {
+    evt.preventDefault();
+
+    socket.emit(
+      'sendMessage',
+      { userId: user.id, roomId, text: message },
+      (err) => {
+        if (err) {
+          // eslint-disable-next-line no-console
+          console.log('Có lỗi xảy ra');
+          return;
+        }
+
+        setMessage('');
+      },
     );
+  };
+
+  return (
+    <div className="chat-messages h-100">
+      <ChatMessagesHeader roomName={roomName} />
+      <ScrollToBottom className="messages-scroll">
+        <ChatMessagesList messages={messages}>
+          {(item) => (item.userId === user.id ? (
+            <li className="chat-message-me">
+              <div className="chat-message-me__text">
+                <p>{item.text}</p>
+                <span>{moment(item.dateCreate).fromNow()}</span>
+              </div>
+              <FontAwesomeIcon icon={faCheck} className="fa-sm" />
+            </li>
+          ) : (
+            <li className="chat-message-friend">
+              <div className="chat-message-friend__infor">
+                <img
+                  className="rounded-circle"
+                  src={
+                    item.user.name === 'admin'
+                      ? 'https://picsum.photos/200'
+                      : item.user.avatar
+                  }
+                  alt="Person"
+                />
+                <small className="text-muted">{item.user.name}</small>
+              </div>
+              <div className="chat-message-friend__text">
+                <p>{item.text}</p>
+                <span>{moment(item.dateCreate).fromNow()}</span>
+              </div>
+            </li>
+          ))}
+        </ChatMessagesList>
+      </ScrollToBottom>
+      <ChatMessagesInput
+        sendMessage={sendMessage}
+        message={message}
+        setMessage={setMessage}
+      />
+    </div>
+  );
+};
+
+ChatMessages.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  location: PropTypes.object.isRequired,
 };
 
 export default ChatMessages;
