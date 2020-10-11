@@ -17,8 +17,15 @@ import {
   InputGroupAddon,
   InputGroupText,
 } from 'reactstrap';
-import { userApi } from '../../api';
-import { LoginContext } from '../../components/providers';
+import { userApi } from '../../apis';
+import {
+  LoginContext,
+  ToastContext,
+  WaitingContext,
+} from '../../components/providers';
+
+// HandleToast
+import handleToast from '../../helpers/handleToast';
 
 // CSS
 import './login.css';
@@ -28,6 +35,8 @@ import person from '../../assets/images/person.svg';
 
 const Login = () => {
   const { isLogin, setLogin, setUser } = useContext(LoginContext);
+  const { toast } = useContext(ToastContext);
+  const { setIsWaiting } = useContext(WaitingContext);
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -39,6 +48,35 @@ const Login = () => {
       .required('Bạn bắt buộc phải nhập mật khẩu'),
   });
 
+  const fetchData = async (values) => {
+    try {
+      const res = await userApi.getToken(values);
+
+      if (res.status === 'success') {
+        const {
+          data: { message, token, user },
+        } = res;
+        if (!token || !user) {
+          throw new Error('Có lỗi xảy ra, vui lòng thử lại');
+        }
+
+        handleToast(toast, message);
+        localStorage.setItem('token', token);
+        setLogin(() => !isLogin);
+        setUser(() => user);
+        setIsWaiting(() => false);
+      } else if (res.status === 'failed') {
+        const {
+          error: { message: errorMessage },
+        } = res;
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      setIsWaiting(() => false);
+      handleToast(toast, error.message, false);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -47,26 +85,8 @@ const Login = () => {
     validationSchema: LoginSchema,
     onSubmit: (values) => {
       // Values = { email, password }
-      userApi
-        .getToken(values)
-        .then((res) => {
-          // console.log(res);
-          const {
-            status,
-            data: { message, token, user },
-          } = res;
-
-          if (status !== 'success' || !token || !user) {
-            throw new Error(message);
-          }
-
-          localStorage.setItem('token', token);
-
-          setLogin(() => !isLogin);
-          setUser(() => user);
-        })
-        // eslint-disable-next-line no-console
-        .catch((error) => console.log(error));
+      setIsWaiting(() => true);
+      fetchData(values);
     },
   });
 

@@ -8,7 +8,7 @@ const ChatContaintRooms = ({ rooms, children }) => (
 ChatContaintRooms.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   rooms: PropTypes.array.isRequired,
-  children: PropTypes.string.isRequired,
+  children: PropTypes.func.isRequired,
 };
 
 export default ChatContaintRooms;

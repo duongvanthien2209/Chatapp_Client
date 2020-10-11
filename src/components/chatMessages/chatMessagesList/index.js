@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const ChatMessagesList = ({ messages, children }) => (
   <ul className="list-unstyled chat-messages-list">
-    {messages.map((item) => children(item))}
+    {messages.map(children)}
   </ul>
 );
 

@@ -2,10 +2,45 @@ import React, { useContext } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import { LoginContext } from '../components/providers';
+import { LoginContext, ToastContext } from '../components/providers';
+
+import handleToast from '../helpers/handleToast';
+
+// Apis
+import { userApi } from '../apis';
 
 const PrivateRoute = ({ path, component: Component }) => {
-  const { isLogin } = useContext(LoginContext);
+  const { isLogin, setLogin, setUser } = useContext(LoginContext);
+  const { toast } = useContext(ToastContext);
+  // const { setIsWaiting } = useContext(WaitingContext);
+
+  const fetchData = async () => {
+    const token = localStorage.getItem('token');
+
+    if (token && !isLogin) {
+      try {
+        const {
+          status,
+          data: { user },
+        } = await userApi.checkToken({ token });
+
+        // debugger;
+        if (status !== 'success' || !user) {
+          throw new Error();
+        }
+
+        setLogin(() => true);
+        setUser(() => user);
+        // setIsWaiting(() => false);
+      } catch (error) {
+        // setIsWaiting(() => false);
+        handleToast(toast, 'Có lỗi xảy ra!', false);
+      }
+    }
+  };
+
+  // setIsWaiting(() => true);
+  fetchData();
 
   return (
     <Route
@@ -24,10 +59,8 @@ const PrivateRoute = ({ path, component: Component }) => {
 };
 
 PrivateRoute.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  path: PropTypes.object.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  component: PropTypes.object.isRequired,
+  path: PropTypes.string.isRequired,
+  component: PropTypes.elementType.isRequired,
 };
 
 export default PrivateRoute;

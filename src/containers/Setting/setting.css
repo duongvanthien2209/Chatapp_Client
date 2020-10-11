@@ -2,10 +2,6 @@
     background-color: white;
 }
 
-.setting-navbar .nav-link {
-    
-}
-
 .setting-personInformation {
     display: flex;
     flex-direction: column;
@@ -20,4 +16,20 @@
     font-size: 1rem;
     padding: .5rem 1rem;
     line-height: 1.5;
+}
+
+.avatar__label {
+  padding: .5rem 1rem;
+  border-radius: .3rem;
+  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(0,219,222,1) 0%, rgba(252,0,255,1) 100%);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.avatar__label:hover {
+  background: #28a745;
+}
+
+.avatar__label:active {
+  background: #6f42c1;
 }

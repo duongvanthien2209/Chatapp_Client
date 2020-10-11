@@ -22,8 +22,7 @@ const ChatContaintInput = ({ onSearch, search, setSearch }) => (
 
 ChatContaintInput.propTypes = {
   onSearch: PropTypes.func.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  search: PropTypes.object.isRequired,
+  search: PropTypes.string.isRequired,
   setSearch: PropTypes.func.isRequired,
 };
 

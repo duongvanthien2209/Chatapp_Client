@@ -18,6 +18,7 @@ const Sidebar = () => {
 
   const onClockOut = (evt) => {
     evt.preventDefault();
+    localStorage.removeItem('token');
     setUser(() => null);
     setLogin(() => false);
   };

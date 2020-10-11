@@ -17,8 +17,11 @@ import {
   InputGroupAddon,
   InputGroupText,
 } from 'reactstrap';
-import { userApi } from '../../api';
-import { LoginContext } from '../../components/providers';
+import { userApi } from '../../apis';
+import { LoginContext, WaitingContext, ToastContext } from '../../components/providers';
+
+// handleToast
+import handleToast from '../../helpers/handleToast';
 
 // CSS
 import '../Login/login.css';
@@ -29,6 +32,8 @@ import person from '../../assets/images/person.svg';
 const Register = () => {
   const [isCompleted, setCompleted] = useState(false);
   const { isLogin } = useContext(LoginContext);
+  const { toast } = useContext(ToastContext);
+  const { setIsWaiting } = useContext(WaitingContext);
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -43,6 +48,26 @@ const Register = () => {
       .required('Bạn bắt buộc phải nhập tên'),
   });
 
+  const fetchData = async (values) => {
+    try {
+      const res = await userApi.register(values);
+
+      if (res.status === 'success') {
+        const { data: { message } } = res;
+
+        setIsWaiting(() => false);
+        setCompleted(() => !isCompleted);
+        handleToast(toast, message);
+      } else if (res.status === 'failed') {
+        const { error: { message } } = res;
+        throw new Error(message);
+      }
+    } catch (error) {
+      setIsWaiting(() => false);
+      handleToast(toast, error.message, false);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -52,22 +77,8 @@ const Register = () => {
     validationSchema: LoginSchema,
     onSubmit: (values) => {
       // Values = { email, password }
-      userApi
-        .register(values)
-        .then((res) => {
-          const {
-            status,
-            data: { message },
-          } = res;
-
-          if (status !== 'success') {
-            throw new Error(message);
-          }
-
-          setCompleted(() => !isCompleted);
-        })
-        // eslint-disable-next-line no-console
-        .catch((err) => console.log(err));
+      setIsWaiting(() => true);
+      fetchData(values);
     },
   });
 

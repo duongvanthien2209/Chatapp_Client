@@ -6,9 +6,6 @@ import {
   Container,
   Row,
   Col,
-  Nav,
-  NavItem,
-  NavLink,
   Form,
   FormGroup,
   Input,
@@ -17,14 +14,19 @@ import {
   FormText,
 } from 'reactstrap';
 
-import { LoginContext } from '../../components/providers/login';
+import { LoginContext, WaitingContext, ToastContext } from '../../components/providers';
 
-import userApi from '../../api/userApi';
+import handleToast from '../../helpers/handleToast';
+
+import userApi from '../../apis/userApi';
 
 import './setting.css';
 
 const Setting = () => {
   const { user, setUser } = useContext(LoginContext);
+  const { toast } = useContext(ToastContext);
+  const { setIsWaiting } = useContext(WaitingContext);
+
   const [file, setFile] = useState(null);
 
   const updateShema = Yup.object().shape({
@@ -35,41 +37,55 @@ const Setting = () => {
     email: Yup.string()
       .email('Bạn nhập sai định dạng')
       .required('Bạn phải nhập email'),
-    password: Yup.string().required('Bạn phải nhập mật khẩu'),
+    password: Yup.string()
+      .min(3, 'Mật khẩu phải nhiều hơn 3 ký tự')
+      .max(10, 'Mật khẩu không quá 10 ký tự'),
   });
+
+  const fetchData = async (formData, userId) => {
+    // debugger;
+    try {
+      const res = await userApi.update(formData, userId);
+
+      if (res.status === 'success') {
+        const { data: { user: currentUser, message } } = res;
+
+        if (!currentUser || !message) {
+          throw new Error('Có lỗi xảy ra');
+        }
+
+        setIsWaiting(() => false);
+        handleToast(toast, message);
+        setUser(() => currentUser);
+      } else if (res.status === 'failed') {
+        const { error: { message } } = res;
+        throw new Error(message);
+      }
+    } catch (error) {
+      // debugger;
+      setIsWaiting(() => false);
+      handleToast(toast, error.message, false);
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
       name: user.name,
       email: user.email,
-      password: user.password,
+      password: '',
     },
     validationSchema: updateShema,
     onSubmit: () => {
+      // debugger;
       const formData = new FormData();
       formData.append('name', formik.values.name);
       formData.append('email', formik.values.email);
       formData.append('password', formik.values.password);
       formData.append('avatar', file);
 
-      // console.log(user);
-      userApi
-        .update(formData, user.id)
-        .then((res) => {
-          // debugger;
-          const {
-            status,
-            data: { currentUser },
-          } = res;
-
-          if (status !== 'success' || !currentUser) {
-            throw new Error('Có lỗi xảy ra');
-          }
-
-          setUser(() => currentUser);
-        })
-        // eslint-disable-next-line no-console
-        .catch((err) => console.log(err));
+      setIsWaiting(() => true);
+      // eslint-disable-next-line no-underscore-dangle
+      fetchData(formData, user._id);
     },
   });
 
@@ -78,16 +94,7 @@ const Setting = () => {
       <Container className="h-100 d-flex flex-column">
         <h4 className="mb-3">Cài đặt</h4>
         <Row className="flex-grow-1">
-          <Col md="4" className="d-none d-md-block">
-            <Nav vertical className="h-100 border setting-navbar">
-              <NavItem>
-                <NavLink className="border-bottom" href="#">
-                  Cập nhật thông tin
-                </NavLink>
-              </NavItem>
-            </Nav>
-          </Col>
-          <Col sm="12" md="8">
+          <Col sm="12">
             <div className="setting-personInformation border">
               <h4 className="border-bottom bg-light">Thông tin cá nhân</h4>
               <Form className="p-5 flex-grow-1" onSubmit={formik.handleSubmit}>
@@ -129,7 +136,7 @@ const Setting = () => {
                 </FormGroup>
                 <FormGroup className="row mb-3">
                   <Label for="password" className="col-sm-2 col-form-label">
-                    Mật khẩu
+                    Mật khẩu mới
                   </Label>
                   <div className="col-sm-10">
                     <Input
@@ -146,22 +153,27 @@ const Setting = () => {
                   </div>
                 </FormGroup>
                 <FormGroup className="row mb-3">
-                  <Label for="avatar" className="col-sm-2 col-form-label">
-                    Ảnh đại diện
-                  </Label>
+                  <p className="col-sm-2 col-form-label">Ảnh đại diện</p>
                   <div className="col-sm-10">
+                    <Label for="avatar" className="avatar__label">
+                      Chọn file
+                    </Label>
                     <Input
                       type="file"
                       id="avatar"
                       name="avatar"
                       onChange={(evt) => setFile(evt.target.files[0])}
+                      hidden
                     />
+                    <span className="ml-2">
+                      {file ? file.name : 'Bạn chưa chọn ảnh'}
+                    </span>
                   </div>
                 </FormGroup>
                 <FormGroup className="row">
                   <div className="col-sm-10 offset-sm-2">
                     <Button className="mr-2" type="reset" color="danger">
-                      Reset
+                      Hủy
                     </Button>
                     <Button type="submit" color="primary">
                       Cập nhật

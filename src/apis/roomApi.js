@@ -1,25 +1,22 @@
 import apiClient from './apiClient';
 import { baseUrl } from '../constants';
 
+const API_ENDPOINT = `${baseUrl}/api/rooms`;
+
 class RoomApi {
   // eslint-disable-next-line class-methods-use-this
   createRoom(_userId, data) {
-    const url = `${baseUrl}/api/rooms/${_userId}`;
-    return apiClient.post(url, data);
+    return apiClient.post(`${API_ENDPOINT}/${_userId}`, data);
   }
 
   // eslint-disable-next-line class-methods-use-this
   getRooms(_userId) {
-    const url = `${baseUrl}/api/rooms/${_userId}`;
-
-    return apiClient.get(url);
+    return apiClient.get(`${API_ENDPOINT}/${_userId}`);
   }
 
   // eslint-disable-next-line class-methods-use-this
   getRoomsByName(value) {
-    const url = `${baseUrl}/api/rooms/search?q=${value}`;
-
-    return apiClient.get(url);
+    return apiClient.get(`${API_ENDPOINT}/search?q=${value}`);
   }
 }
 

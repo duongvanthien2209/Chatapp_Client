@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Button,
   Modal,
@@ -18,11 +18,18 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
-import { roomApi } from '../../../api';
+// Contexts
+import { ToastContext, WaitingContext } from '../../providers';
+
+import handleToast from '../../../helpers/handleToast';
+
+import { roomApi } from '../../../apis';
 
 const ChatContaintHeader = ({ setRooms, user }) => {
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
+  const { toast } = useContext(ToastContext);
+  const { setIsWaiting } = useContext(WaitingContext);
 
   const RoomSchema = Yup.object().shape({
     name: Yup.string()
@@ -31,30 +38,41 @@ const ChatContaintHeader = ({ setRooms, user }) => {
       .required('Bạn phải nhập tên phòng'),
   });
 
+  const fetchData = async (userId, values) => {
+    setIsWaiting(() => true);
+    try {
+      const res = await roomApi.createRoom(userId, values);
+
+      if (res.status === 'success') {
+        const { data: { room, message } } = res;
+
+        if (!room || !message) {
+          throw new Error('Có lỗi xảy ra');
+        }
+
+        setIsWaiting(() => false);
+        toggle();
+        setRooms((currentRooms) => [...currentRooms, room]);
+        handleToast(toast, message);
+      } else if (res.status === 'failed') {
+        const { error: { message } } = res;
+        throw new Error(message);
+      }
+    } catch (error) {
+      setIsWaiting(() => false);
+      toggle();
+      handleToast(toast, error.message, false);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       name: '',
     },
     validationSchema: RoomSchema,
-    onSubmit: () => {
-      roomApi
-        .createRoom(user.id, { name: formik.values.name })
-        .then((res) => {
-          // debugger;
-          const {
-            status,
-            data: { room },
-          } = res;
-
-          if (status !== 'success' || !room) {
-            throw new Error('Có lỗi xảy ra');
-          }
-
-          toggle();
-          setRooms((currentRooms) => [...currentRooms, room]);
-        })
-        // eslint-disable-next-line no-console
-        .catch((err) => console.log(err));
+    onSubmit: (values) => {
+      // eslint-disable-next-line no-underscore-dangle
+      fetchData(user._id, values);
     },
   });
 
@@ -94,8 +112,8 @@ const ChatContaintHeader = ({ setRooms, user }) => {
           <Button color="primary" onClick={formik.handleSubmit}>
             Tạo
           </Button>
-          <Button color="secondary" onClick={toggle}>
-            Xóa
+          <Button color="danger" onClick={toggle}>
+            Hủy
           </Button>
         </ModalFooter>
       </Modal>

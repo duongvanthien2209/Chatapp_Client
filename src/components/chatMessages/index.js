@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect, useContext } from 'react';
 import queryString from 'query-string';
 import io from 'socket.io-client';
@@ -9,15 +10,20 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import ChatMessagesHeader from './chatMessagesHeader';
-import ChatMessagesList from './chatMessagesList';
-import ChatMessagesInput from './chatMessagesInput';
+import ChatMessagesHeader from './ChatMessagesHeader';
+import ChatMessagesList from './ChatMessagesList';
+import ChatMessagesInput from './ChatMessagesInput';
+
+// Constaints
+import { ENDPOINT } from '../../constants/index';
 
 // Contexts
-import { LoginContext } from '../providers';
+import { LoginContext, WaitingContext, ToastContext } from '../providers';
+
+import handleToast from '../../helpers/handleToast';
 
 // Apis
-import messageApi from '../../api/messageApi';
+import messageApi from '../../apis/messageApi';
 
 let socket;
 
@@ -28,8 +34,37 @@ const ChatMessages = ({ location }) => {
   const [message, setMessage] = useState('');
 
   const { user } = useContext(LoginContext);
+  const { toast } = useContext(ToastContext);
+  const { setIsWaiting } = useContext(WaitingContext);
 
-  const ENDPOINT = 'https://chap-app-server.herokuapp.com/';
+  const fetchData = async () => {
+    try {
+      const {
+        status,
+        data: { messages: newMessages },
+      } = await messageApi.getMessagesByRoomId(roomId);
+
+      if (status !== 'success' || !newMessages) {
+        throw new Error('Có lỗi xảy ra');
+      }
+
+      setIsWaiting(() => false);
+      setMessages(() => newMessages);
+
+      // eslint-disable-next-line no-underscore-dangle
+      socket.emit('join', { roomId, userId: user._id }, (err) => {
+        if (err) {
+          return handleToast(toast, 'Có lỗi xảy ra!', false);
+        }
+
+        return true;
+      });
+
+      return true;
+    } catch (error) {
+      return handleToast(toast, 'Có lỗi xảy ra!', false);
+    }
+  };
 
   // ComponentDidMount => tải messages
   useEffect(() => {
@@ -45,34 +80,8 @@ const ChatMessages = ({ location }) => {
       setMessages((currentMessages) => [...currentMessages, currentMessage]);
     });
     // debugger;
-    messageApi
-      .getMessagesByRoomId(roomId)
-      .then((res) => {
-        // debugger;
-        const {
-          status,
-          data: { messages: newMessages },
-        } = res;
-
-        if (status !== 'success' || !newMessages) {
-          throw new Error('Có lỗi xảy ra');
-        }
-
-        setMessages(() => newMessages);
-
-        socket.emit('join', { roomId, userId: user.id }, (err) => {
-          if (err) {
-            // eslint-disable-next-line no-console
-            console.log('Có lỗi xảy ra');
-            return;
-          }
-
-          // eslint-disable-next-line no-console
-          console.log('Done');
-        });
-      })
-      // eslint-disable-next-line no-console
-      .catch((err) => console.log(err));
+    setIsWaiting(() => true);
+    fetchData();
 
     return () => {
       socket.emit('disconnect', { roomId, userName: user.name });
@@ -86,7 +95,8 @@ const ChatMessages = ({ location }) => {
 
     socket.emit(
       'sendMessage',
-      { userId: user.id, roomId, text: message },
+      // eslint-disable-next-line no-underscore-dangle
+      { userId: user._id, roomId, text: message },
       (err) => {
         if (err) {
           // eslint-disable-next-line no-console
@@ -104,8 +114,8 @@ const ChatMessages = ({ location }) => {
       <ChatMessagesHeader roomName={roomName} />
       <ScrollToBottom className="messages-scroll">
         <ChatMessagesList messages={messages}>
-          {(item) => (item.userId === user.id ? (
-            <li className="chat-message-me">
+          {(item, key) => (item.userId === user._id ? (
+            <li className="chat-message-me" key={key}>
               <div className="chat-message-me__text">
                 <p>{item.text}</p>
                 <span>{moment(item.dateCreate).fromNow()}</span>
@@ -113,7 +123,7 @@ const ChatMessages = ({ location }) => {
               <FontAwesomeIcon icon={faCheck} className="fa-sm" />
             </li>
           ) : (
-            <li className="chat-message-friend">
+            <li className="chat-message-friend" key={key}>
               <div className="chat-message-friend__infor">
                 <img
                   className="rounded-circle"
