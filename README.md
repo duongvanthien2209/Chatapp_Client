@@ -2,7 +2,7 @@
 ## Demo Live
 * Live App tại [Surge](http://chat-app-client.surge.sh/)
 * Live Api tại [Heroku](https://chap-app-server.herokuapp.com/)
-## Link Client
+## Link Server
 [ChatAppServer](https://github.com/duongvanthien2209/Chatapp_Server)
 ## Các chức năng chính
 ### Auth
