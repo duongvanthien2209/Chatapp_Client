@@ -39,6 +39,7 @@ const ChatMessages = ({ location }) => {
 
   const fetchData = async () => {
     try {
+      // debugger;
       const {
         status,
         data: { messages: newMessages },
@@ -79,7 +80,7 @@ const ChatMessages = ({ location }) => {
       // debugger;
       setMessages((currentMessages) => [...currentMessages, currentMessage]);
     });
-    // debugger;
+
     setIsWaiting(() => true);
     fetchData();
 
@@ -114,7 +115,7 @@ const ChatMessages = ({ location }) => {
       <ChatMessagesHeader roomName={roomName} />
       <ScrollToBottom className="messages-scroll">
         <ChatMessagesList messages={messages}>
-          {(item, key) => (item.userId === user._id ? (
+          {(item, key) => (item.userId._id === user._id ? (
             <li className="chat-message-me" key={key}>
               <div className="chat-message-me__text">
                 <p>{item.text}</p>
@@ -128,13 +129,13 @@ const ChatMessages = ({ location }) => {
                 <img
                   className="rounded-circle"
                   src={
-                    item.user.name === 'admin'
-                      ? 'https://picsum.photos/200'
-                      : item.user.avatar
-                  }
+                      item.userId.name === 'admin'
+                        ? 'https://picsum.photos/200'
+                        : item.userId.avatar
+                    }
                   alt="Person"
                 />
-                <small className="text-muted">{item.user.name}</small>
+                <small className="text-muted">{item.userId.name}</small>
               </div>
               <div className="chat-message-friend__text">
                 <p>{item.text}</p>
