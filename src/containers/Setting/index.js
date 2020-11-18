@@ -14,7 +14,7 @@ import {
   FormText,
 } from 'reactstrap';
 
-import { LoginContext, WaitingContext, ToastContext } from '../../components/providers';
+import { LoginContext, WaitingContext, ToastContext } from '../../components/Providers';
 
 import handleToast from '../../helpers/handleToast';
 

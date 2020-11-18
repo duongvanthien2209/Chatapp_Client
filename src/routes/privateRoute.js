@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import { LoginContext, ToastContext } from '../components/providers';
+import { LoginContext, ToastContext } from '../components/Providers';
 
 import handleToast from '../helpers/handleToast';
 

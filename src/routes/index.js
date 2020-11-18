@@ -7,7 +7,7 @@ import {
   LoginProvider,
   ToastProvider,
   WaitingProvider,
-} from '../components/providers';
+} from '../components/Providers';
 import PrivateRoute from './privateRoute';
 
 const Routes = () => (

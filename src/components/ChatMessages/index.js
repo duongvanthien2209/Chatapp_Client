@@ -18,7 +18,7 @@ import ChatMessagesInput from './ChatMessagesInput';
 import { ENDPOINT } from '../../constants/index';
 
 // Contexts
-import { LoginContext, WaitingContext, ToastContext } from '../providers';
+import { LoginContext, WaitingContext, ToastContext } from '../Providers';
 
 import handleToast from '../../helpers/handleToast';
 

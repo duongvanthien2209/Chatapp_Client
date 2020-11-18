@@ -22,7 +22,7 @@ import {
   LoginContext,
   ToastContext,
   WaitingContext,
-} from '../../components/providers';
+} from '../../components/Providers';
 
 // HandleToast
 import handleToast from '../../helpers/handleToast';

@@ -11,7 +11,7 @@ import {
   faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { LoginContext } from '../providers';
+import { LoginContext } from '../Providers';
 
 const Sidebar = () => {
   const { user, setUser, setLogin } = useContext(LoginContext);

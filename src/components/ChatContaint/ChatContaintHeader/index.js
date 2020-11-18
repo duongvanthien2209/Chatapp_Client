@@ -19,7 +19,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 // Contexts
-import { ToastContext, WaitingContext } from '../../providers';
+import { ToastContext, WaitingContext } from '../../Providers';
 
 import handleToast from '../../../helpers/handleToast';
 

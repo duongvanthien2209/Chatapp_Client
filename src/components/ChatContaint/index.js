@@ -5,7 +5,7 @@ import { Button } from 'reactstrap';
 import classNames from 'classnames';
 
 // Contexts
-import { LoginContext, WaitingContext, ToastContext } from '../providers';
+import { LoginContext, WaitingContext, ToastContext } from '../Providers';
 
 import handleToast from '../../helpers/handleToast';
 // Apis
