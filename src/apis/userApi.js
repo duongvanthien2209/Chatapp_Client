@@ -1,9 +1,8 @@
 import axiosClient from './apiClient';
-import { baseUrl } from '../constants';
 
 class UserApi {
   constructor() {
-    this.API_ENDPOINT = `${baseUrl}/api/auth`;
+    this.API_ENDPOINT = '/auth';
   }
 
   getToken(data) {
