@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect, useContext } from 'react';
 import queryString from 'query-string';
@@ -71,11 +72,6 @@ const ChatMessages = ({ location }) => {
   useEffect(() => {
     socket = io(ENDPOINT);
 
-    socket.on('event', (text) => {
-      // eslint-disable-next-line no-console
-      console.log(text);
-    });
-
     socket.on('message', (currentMessage) => {
       // debugger;
       setMessages((currentMessages) => [...currentMessages, currentMessage]);
@@ -100,8 +96,7 @@ const ChatMessages = ({ location }) => {
       { userId: user._id, roomId, text: message },
       (err) => {
         if (err) {
-          // eslint-disable-next-line no-console
-          console.log('Có lỗi xảy ra');
+          console.error('Có lỗi xảy ra');
           return;
         }
 
